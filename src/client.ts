@@ -1,4 +1,5 @@
 import axios from 'axios';
+import _ = require('lodash');
 import * as vscode from 'vscode';
 import { Config } from "./config";
 
@@ -13,7 +14,7 @@ export class Client {
     }
 
     public init() {
-        this.isActive = true;
+        this.start();
         this.requestLoop = async () => {
             while (true) {
                 await new Promise(resolve => setTimeout(resolve, this.interval));
@@ -24,13 +25,20 @@ export class Client {
                 let data = [];
                 try {
                     data = (await axios.get<{ id: number; area: string; }[]>(Config.RED_ALERTS_API)).data;
+                    if (!_.isArray(data)) {
+                        continue;
+                    }
 
-                    const lastId = data[0].id;
+                    const lastId = this.lastId;
+                    const currentId = data[0].id;
                     data = data.filter(record =>
                         record.id > this.lastId && record.area === this.area
                     );
-                    this.lastId = lastId;
 
+                    this.lastId = currentId;
+                    if (!lastId) {
+                        continue;
+                    }
                     data.forEach(record => {
                         vscode.window.showErrorMessage(`צבע אדום ב ${record.area}`)
                     });
@@ -51,5 +59,9 @@ export class Client {
 
     public stop() {
         this.isActive = false;
+    }
+
+    public start() {
+        this.isActive = true;
     }
 }
