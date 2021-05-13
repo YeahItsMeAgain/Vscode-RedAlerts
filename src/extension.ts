@@ -11,7 +11,15 @@ export function activate(context: vscode.ExtensionContext) {
 		return;
 	}
 
+	vscode.window.showInformationMessage(`redAlert extension is enabled for ${config.getArea()}`);
 	client.init();
+
+	context.subscriptions.push(
+		vscode.workspace.onDidChangeConfiguration((_) => {
+			console.log('redAlerts config changed');
+			client.restart();
+		}),
+	);
 }
 
 export function deactivate() { }

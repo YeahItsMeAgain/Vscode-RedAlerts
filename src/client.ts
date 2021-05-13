@@ -3,14 +3,22 @@ import _ = require('lodash');
 import * as vscode from 'vscode';
 import { Config } from "./config";
 
+const sound = require("sound-play");
+
 export class Client {
-    private interval = Config.getRequestInterval();
+    private interval = Config.DEFAULT_INTERVAL;
     private requestLoop: { (): void; (): Promise<never>; } | undefined;
     private isActive = false;
     private lastId = 0;
-    private area = Config.getArea();
+    private area: string | undefined;
 
     constructor() {
+        this.refreshConfig()
+    }
+
+    private refreshConfig() {
+        this.interval = Config.getRequestInterval();
+        this.area = Config.getArea();
     }
 
     public init() {
@@ -40,7 +48,8 @@ export class Client {
                         continue;
                     }
                     data.forEach(record => {
-                        vscode.window.showErrorMessage(`צבע אדום ב ${record.area}`)
+                        vscode.window.showErrorMessage(`צבע אדום ב${record.area}`)
+                        sound.play(Config.getAlertSound());
                     });
                 } catch (error) {
                     vscode.window.showErrorMessage(error.response.data);
@@ -63,5 +72,11 @@ export class Client {
 
     public start() {
         this.isActive = true;
+    }
+
+    public restart() {
+        this.stop();
+        this.refreshConfig();
+        this.start();
     }
 }
