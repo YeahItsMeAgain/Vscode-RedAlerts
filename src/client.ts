@@ -23,10 +23,13 @@ export class Client {
 
                 let data = [];
                 try {
-                    data = (await axios.get<{ id: number; area: string; }[]>(Config.RED_ALERTS_API)).data
-                        .filter(record =>
-                            record.id > this.lastId && record.area === this.area
-                        );
+                    data = (await axios.get<{ id: number; area: string; }[]>(Config.RED_ALERTS_API)).data;
+
+                    const lastId = data[0].id;
+                    data = data.filter(record =>
+                        record.id > this.lastId && record.area === this.area
+                    );
+                    this.lastId = lastId;
 
                     data.forEach(record => {
                         vscode.window.showErrorMessage(`צבע אדום ב ${record.area}`)
