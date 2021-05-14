@@ -2,15 +2,23 @@ import axios from 'axios';
 import _ = require('lodash');
 import * as vscode from 'vscode';
 import { Config } from "./config";
+import { Player } from './player';
 
-const sound = require("sound-play");
-
+const areaFilter = (area: string, userArea: string) => {
+    if (userArea.indexOf(' -') === -1) {
+        const lastAreaChar = area.indexOf(' -');
+        if (lastAreaChar !== -1) {
+            area = area.substr(0, lastAreaChar);
+        }
+    }
+    return area === userArea;
+}
 export class Client {
     private interval = Config.DEFAULT_INTERVAL;
     private requestLoop: { (): void; (): Promise<never>; } | undefined;
     private isActive = false;
     private lastId = 0;
-    private area: string | undefined;
+    private area = '';
 
     constructor() {
         this.refreshConfig()
@@ -40,19 +48,20 @@ export class Client {
                     const lastId = this.lastId;
                     const currentId = data[0].id;
                     data = data.filter(record =>
-                        record.id > this.lastId && record.area === this.area
+                        record.id > this.lastId && areaFilter(record.area, this.area)
                     );
 
                     this.lastId = currentId;
                     if (!lastId) {
                         continue;
                     }
-                    data.forEach(record => {
+                    data.forEach(async record => {
                         vscode.window.showErrorMessage(`צבע אדום ב${record.area}`)
-                        sound.play(Config.getAlertSound());
+                        await Player.play(Config.getAlertSound())
+                        // sound.play(Config.getAlertSound());
                     });
                 } catch (error) {
-                    vscode.window.showErrorMessage(error.response.data);
+                    vscode.window.showErrorMessage(error);
                 }
             }
         }

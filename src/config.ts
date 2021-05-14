@@ -39,6 +39,6 @@ export class Config {
     }
 
     public static getAlertSound() {
-        return join(__dirname, '..', 'assets', 'alert.mp3');
+        return join(__dirname, '..', 'assets', 'alert.wav');
     }
 }
