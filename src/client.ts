@@ -1,25 +1,28 @@
 import axios from 'axios';
 import * as vscode from 'vscode';
 import { Config } from "./config";
-import { asyncSleep } from './utils';
+import { asyncSleep, extractArea } from './utils';
 
 const sound = require("sound-play");
 
-const areaFilter = (area: string, userArea: string) => {
-    if (userArea.indexOf(' -') === -1) {
-        const lastAreaChar = area.indexOf(' -');
-        if (lastAreaChar !== -1) {
-            area = area.substr(0, lastAreaChar);
+const areaFilter = (area: string, userAreas: string[]) => {
+    for (const userArea of userAreas) {
+        if (userArea.indexOf(' -') === -1) {
+            area = extractArea(area);
+        }
+        if (area === userArea) {
+            return true;
         }
     }
-    return area === userArea;
+    return false;
 }
+
 export class Client {
     private interval = Config.DEFAULT_INTERVAL;
     private requestLoop: { (): void; (): Promise<never>; } | undefined;
     private isActive = false;
     private previousId = 0;
-    private area = "";
+    private areas = [""];
     private isInit = false;
 
     constructor() {
@@ -28,7 +31,7 @@ export class Client {
 
     private refreshConfig() {
         this.interval = Config.getRequestInterval();
-        this.area = Config.getArea();
+        this.areas = Config.getAreas();
     }
 
     public init() {
@@ -52,7 +55,7 @@ export class Client {
                         continue;
                     }
 
-                    data.filter(record => record.id > previousId && areaFilter(record.area, this.area))
+                    data.filter(record => record.id > previousId && areaFilter(record.area, this.areas))
                         .forEach(record => {
                             vscode.window.showErrorMessage(`צבע אדום ב${record.area}`)
                             sound.play(Config.getAlertSound());
@@ -63,7 +66,7 @@ export class Client {
             }
         }
         this.run();
-        vscode.window.showInformationMessage(`redAlert extension is enabled for ${this.area}`);
+        vscode.window.showInformationMessage(`redAlert extension is enabled for ${this.areas}`);
         this.isInit = true;
     }
 

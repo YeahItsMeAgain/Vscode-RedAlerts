@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import { join } from 'path';
 
 export enum ConfigFields {
-    area = 'area',
+    areas = 'areas',
     pollingInterval = 'pollingInterval'
 };
 
@@ -18,16 +18,17 @@ export class Config {
     }
 
     public static isActive(config = Config.getConfig()) {
-        return !!Config.getArea(config);
+        const areas = Config.getAreas(config);
+        return areas.length && areas.every(area => !!area);
     }
 
     public static getRequestInterval(config = Config.getConfig()) {
         return config.get(ConfigFields.pollingInterval, Config.DEFAULT_INTERVAL);
     }
 
-    public static getArea(config = Config.getConfig()) {
-        const area = config.get(ConfigFields.area);
-        return (typeof area === "string" && area) || "";
+    public static getAreas(config = Config.getConfig()): string[] {
+        const areas = config.get(ConfigFields.areas);
+        return Array.isArray(areas) ? areas : [];
     }
 
     public static getAlertSound() {

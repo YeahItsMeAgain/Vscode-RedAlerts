@@ -6,7 +6,7 @@ const client = new Client();
 
 export function activate(context: vscode.ExtensionContext) {
 	if (!Config.isActive()) {
-		vscode.window.showErrorMessage('No area configured for redAlerts, configure in `redAlerts.area`')
+		vscode.window.showErrorMessage('No area configured for redAlerts, configure in `redAlerts.areas`')
 	} else {
 		client.init();
 	}
@@ -16,8 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
 			console.log('redAlerts config changed');
 
 			if (Config.isActive()) {
-				if (event.affectsConfiguration(`${Config.CONFIG}.${ConfigFields.area}`)) {
-					vscode.window.showInformationMessage(`redAlert extension is enabled for ${Config.getArea()}`);
+				if (event.affectsConfiguration(`${Config.CONFIG}.${ConfigFields.areas}`)) {
+					vscode.window.showInformationMessage(`redAlert extension is enabled for ${Config.getAreas()}`);
 				}
 				client.restart();
 			} else {

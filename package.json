@@ -26,11 +26,11 @@
 				"redAlerts.pollingInterval": {
 					"type": "number",
 					"default": 10,
-					"description": "The interval to delay the alerts."
+					"description": "The interval to delay the alerts in sec."
 				},
-				"redAlerts.area": {
-					"type": "string",
-					"description": "The area to delay the alerts for."
+				"redAlerts.areas": {
+					"type": "array",
+					"description": "The areas to delay the alerts for. (for example: ['אשקלון', 'אשדוד', 'באר שבע'])"
 				}
 			}
 		}
