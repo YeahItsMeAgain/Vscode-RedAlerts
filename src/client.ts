@@ -19,6 +19,7 @@ export class Client {
     private isActive = false;
     private lastId = 0;
     private area = '';
+    private isInit = false;
 
     constructor() {
         this.refreshConfig()
@@ -58,7 +59,6 @@ export class Client {
                     data.forEach(async record => {
                         vscode.window.showErrorMessage(`צבע אדום ב${record.area}`)
                         await Player.play(Config.getAlertSound())
-                        // sound.play(Config.getAlertSound());
                     });
                 } catch (error) {
                     vscode.window.showErrorMessage(error);
@@ -66,6 +66,8 @@ export class Client {
             }
         }
         this.run();
+        vscode.window.showInformationMessage(`redAlert extension is enabled for ${this.area}`);
+        this.isInit = true;
     }
 
 
@@ -84,8 +86,13 @@ export class Client {
     }
 
     public restart() {
-        this.stop();
         this.refreshConfig();
-        this.start();
+
+        if (!this.isInit) {
+            this.init();
+        } else {
+            this.stop();
+            this.start();
+        }
     }
 }

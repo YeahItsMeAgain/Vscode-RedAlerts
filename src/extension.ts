@@ -2,24 +2,28 @@ import * as vscode from 'vscode';
 import { Client } from './client';
 import { Config } from './config';
 
-export function activate(context: vscode.ExtensionContext) {
-	const config = new Config();
-	const client = new Client();
+const client = new Client();
 
-	if (!config.isActive()) {
+export function activate(context: vscode.ExtensionContext) {
+	if (!Config.isActive()) {
 		vscode.window.showErrorMessage('No area configured for redAlerts, configure in `redAlerts.area`')
-		return;
+	} else {
+		client.init();
 	}
 
-	vscode.window.showInformationMessage(`redAlert extension is enabled for ${config.getArea()}`);
-	client.init();
-
 	context.subscriptions.push(
-		vscode.workspace.onDidChangeConfiguration((_) => {
+		vscode.workspace.onDidChangeConfiguration(() => {
 			console.log('redAlerts config changed');
-			client.restart();
+
+			if (Config.isActive()) {
+				client.restart();
+			} else {
+				client.stop();
+			}
 		}),
 	);
 }
 
-export function deactivate() { }
+export function deactivate() {
+	client.stop();
+}
