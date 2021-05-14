@@ -1,8 +1,8 @@
 import axios from 'axios';
-import _ = require('lodash');
 import * as vscode from 'vscode';
 import { Config } from "./config";
 import { Player } from './player';
+import { asyncSleep } from './utils';
 
 const areaFilter = (area: string, userArea: string) => {
     if (userArea.indexOf(' -') === -1) {
@@ -17,8 +17,8 @@ export class Client {
     private interval = Config.DEFAULT_INTERVAL;
     private requestLoop: { (): void; (): Promise<never>; } | undefined;
     private isActive = false;
-    private lastId = 0;
-    private area = '';
+    private previousId = 0;
+    private area = "";
     private isInit = false;
 
     constructor() {
@@ -34,32 +34,28 @@ export class Client {
         this.start();
         this.requestLoop = async () => {
             while (true) {
-                await new Promise(resolve => setTimeout(resolve, this.interval));
+                await asyncSleep(this.interval);
                 if (!this.isActive) {
                     continue;
                 }
 
-                let data = [];
                 try {
-                    data = (await axios.get<{ id: number; area: string; }[]>(Config.RED_ALERTS_API)).data;
-                    if (!_.isArray(data)) {
+                    const { data } = await axios.get<{ id: number; area: string; }[]>(Config.RED_ALERTS_API);
+                    if (!Array.isArray(data) || !data.length) {
                         continue;
                     }
 
-                    const lastId = this.lastId;
-                    const currentId = data[0].id;
-                    data = data.filter(record =>
-                        record.id > this.lastId && areaFilter(record.area, this.area)
-                    );
-
-                    this.lastId = currentId;
-                    if (!lastId) {
+                    const previousId = this.previousId;
+                    this.previousId = data[0].id;
+                    if (!previousId) {
                         continue;
                     }
-                    data.forEach(async record => {
-                        vscode.window.showErrorMessage(`צבע אדום ב${record.area}`)
-                        await Player.play(Config.getAlertSound())
-                    });
+
+                    data.filter(record => record.id > previousId && areaFilter(record.area, this.area))
+                        .forEach(async record => {
+                            vscode.window.showErrorMessage(`צבע אדום ב${record.area}`)
+                            await Player.play(Config.getAlertSound())
+                        });
                 } catch (error) {
                     vscode.window.showErrorMessage(error);
                 }
@@ -69,7 +65,6 @@ export class Client {
         vscode.window.showInformationMessage(`redAlert extension is enabled for ${this.area}`);
         this.isInit = true;
     }
-
 
     public run() {
         if (this.requestLoop) {

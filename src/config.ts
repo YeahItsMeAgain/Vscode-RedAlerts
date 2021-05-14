@@ -1,14 +1,13 @@
 import * as vscode from 'vscode';
-import * as _ from 'lodash';
 import { join } from 'path';
 
-enum ConfigFields {
+export enum ConfigFields {
     area = 'area',
     pollingInterval = 'pollingInterval'
 };
 
 export class Config {
-    private static readonly CONFIG = 'redAlerts'
+    public static readonly CONFIG = 'redAlerts'
     public static readonly RED_ALERTS_API = 'https://redalert.me/alerts'
     public static readonly DEFAULT_INTERVAL = 10;
 
@@ -19,7 +18,7 @@ export class Config {
     }
 
     public static isActive(config = Config.getConfig()) {
-        return _.isString(config.get(ConfigFields.area)) && !_.isEmpty(config.get(ConfigFields.area));
+        return !!Config.getArea(config);
     }
 
     public static getRequestInterval(config = Config.getConfig()) {
@@ -27,7 +26,8 @@ export class Config {
     }
 
     public static getArea(config = Config.getConfig()) {
-        return _.toString(config.get(ConfigFields.area));
+        const area = config.get(ConfigFields.area);
+        return (typeof area === "string" && area) || "";
     }
 
     public static getAlertSound() {

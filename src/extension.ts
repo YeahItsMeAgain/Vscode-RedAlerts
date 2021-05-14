@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { Client } from './client';
-import { Config } from './config';
+import { Config, ConfigFields } from './config';
 
 const client = new Client();
 
@@ -12,10 +12,13 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 
 	context.subscriptions.push(
-		vscode.workspace.onDidChangeConfiguration(() => {
+		vscode.workspace.onDidChangeConfiguration((event) => {
 			console.log('redAlerts config changed');
 
 			if (Config.isActive()) {
+				if (event.affectsConfiguration(`${Config.CONFIG}.${ConfigFields.area}`)) {
+					vscode.window.showInformationMessage(`redAlert extension is enabled for ${Config.getArea()}`);
+				}
 				client.restart();
 			} else {
 				client.stop();
