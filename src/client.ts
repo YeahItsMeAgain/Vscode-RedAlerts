@@ -1,8 +1,9 @@
 import axios from 'axios';
 import * as vscode from 'vscode';
 import { Config } from "./config";
-import { Player } from './player';
 import { asyncSleep } from './utils';
+
+const sound = require("sound-play");
 
 const areaFilter = (area: string, userArea: string) => {
     if (userArea.indexOf(' -') === -1) {
@@ -52,9 +53,9 @@ export class Client {
                     }
 
                     data.filter(record => record.id > previousId && areaFilter(record.area, this.area))
-                        .forEach(async record => {
+                        .forEach(record => {
                             vscode.window.showErrorMessage(`צבע אדום ב${record.area}`)
-                            await Player.play(Config.getAlertSound())
+                            sound.play(Config.getAlertSound());
                         });
                 } catch (error) {
                     vscode.window.showErrorMessage(error);
