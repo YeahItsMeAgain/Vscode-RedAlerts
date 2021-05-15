@@ -19,4 +19,4 @@ This extension will display red alerts and play a sound.
 ![example](assets/example.png)
 
 ## License
-UwU
+WTFPL
