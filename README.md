@@ -18,5 +18,8 @@ This extension will display red alerts and play a sound.
 ## Example
 ![example](assets/example.png)
 
+## Link
+https://marketplace.visualstudio.com/items?itemName=Mevaser.redalerts
+
 ## License
 WTFPL
