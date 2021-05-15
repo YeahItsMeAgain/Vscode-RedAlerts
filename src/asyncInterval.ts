@@ -30,6 +30,7 @@ export class AsyncInterval {
 
     public restart(delay: number) {
         this.delay = delay;
+        this.stop();
         this.start();
     }
 
