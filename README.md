@@ -8,7 +8,7 @@ This extension will display red alerts and play a sound.
 
 - Add the areas you want to get notified about in the settings("redAlerts.areas").
   >
-  > <ins>settings.json</ins>
+  > [<ins>settings.json</ins>](https://code.visualstudio.com/docs/getstarted/settings#_settings-file-locations)
   > ```json
   > {
   >     "redAlerts.areas": ["אשקלון", "אשדוד"]
