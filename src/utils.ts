@@ -1,17 +1,15 @@
-function extractArea(area: string) {
+function extractArea(removeUnderscore: boolean, area: string) {
     const lastAreaChar = area.indexOf(' -');
-    if (lastAreaChar !== -1) {
-        area = area.substr(0, lastAreaChar);
+    if (!removeUnderscore || lastAreaChar !== -1) {
+        return area;
     }
-    return area;
+
+    return area.substr(0, lastAreaChar);
 }
 
 export function areaFilter(area: string, userAreas: string[]) {
     for (const userArea of userAreas) {
-        if (userArea.includes(' -')) {
-            area = extractArea(area);
-        }
-        if (area === userArea) {
+        if (extractArea(userArea.includes(' -'), area) === userArea) {
             return true;
         }
     }
