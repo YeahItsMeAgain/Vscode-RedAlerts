@@ -41,8 +41,8 @@ export class AsyncInterval {
             return;
         }
 
-        this.currentTimer = setTimeout(() => {
-            this.run();
-        }, this.delay);
+        this.currentTimer = setTimeout(async () => {
+            await this.run();
+        }, this.delay * 1000);
     }
 }
