@@ -1,6 +1,6 @@
 function extractArea(removeUnderscore: boolean, area: string) {
     const lastAreaChar = area.indexOf(' -');
-    if (!removeUnderscore || lastAreaChar !== -1) {
+    if (!removeUnderscore || lastAreaChar === -1) {
         return area;
     }
 
